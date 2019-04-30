@@ -1,109 +1,55 @@
 package org.quain.groupchat.android;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.view.ViewTreeObserver;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import android.os.*;
+import android.view.*;
+import android.content.*;
+import android.widget.*;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.json.JSONObject;
+
+import java.io.*;
+
+import static org.quain.groupchat.android.SocketService.myMsgList;
+import static org.quain.groupchat.android.SocketService.socket;
+import static org.quain.groupchat.android.SocketService.socketAliveFlag;
 
 public class MainActivity extends AppCompatActivity {
-	final int UPDATE_TEXT_FROM_SYSTEM = 0;
-	final int UPDATE_TEXT_FROM_SERVER = 1;
-	final int ENABLE_BUTTON_CONNECT = 2;
-	final int DISABLE_BUTTON_CONNECT = 3;
-	final int ENABLE_BUTTON_DISCONNECT = 4;
-	final int DISABLE_BUTTON_DISCONNECT = 5;
-	final int CLEAR_EDIT_SEND = 6;
+	public static final int UPDATE_TEXT_FROM_SYSTEM = 0;
+	public static final int UPDATE_TEXT_FROM_SERVER = 1;
+	public static final int CLEAR_EDIT_SEND = 2;
 
 	TextView text_content;
-	EditText text_host;
-	EditText text_port;
-	EditText username;
 	EditText edit_send;
 	Button btn_send;
-	Button btn_connect;
-	Button btn_disconnect;
 	ScrollView text_scroll;
 
-	String host;
-	int port;
-	Socket socket;
-
 	PrintWriter out;// 字符输出流
-	BufferedReader in;// 字符输入流
-
-	Thread subThread;//连接服务器、接收消息线程
 	Thread subThread_sendMsg;//发送消息线程
-
-	StringBuilder sb;
-	String newServerMsg;
-	String newClientMsg;
-	String newSystemMsg;
-
-	boolean connectionAliveFlag;
-
+	static StringBuilder sb = new StringBuilder();
+	static String newServerMsg;
+	static String newClientMsg;
+	static String newSystemMsg;
+	public static boolean mainActivityAliveFlag = false;
+	public static Thread refreshMsgListThread;
 	//定义一个handler对象，用来刷新界面
-	private Handler handler = new Handler(new Handler.Callback() {
+	Handler handler = new Handler(new Handler.Callback() {
 		@Override
 		public boolean handleMessage(Message msg) {
 			switch (msg.what) {
 				case UPDATE_TEXT_FROM_SYSTEM:
-					sb.append(newSystemMsg.substring(0, newSystemMsg.indexOf("：")));
-					sb.append("\n");
-					sb.append(newSystemMsg.substring(newSystemMsg.indexOf("：") + 1));
+					sb.append(newSystemMsg);
 					text_content.setText(sb);
-					text_scroll.fullScroll(ScrollView.FOCUS_DOWN);
-					sb.append("\n\n");
+					sb.append("\n");
 					text_content.setText(sb);
 					text_scroll.fullScroll(ScrollView.FOCUS_DOWN);
 					break;
 				case UPDATE_TEXT_FROM_SERVER:
-					sb.append(newServerMsg.substring(0, newServerMsg.indexOf("：")));
+					sb.append(newServerMsg);
+					text_content.setText(sb);
 					sb.append("\n");
-					sb.append(newServerMsg.substring(newServerMsg.indexOf("：") + 1));
 					text_content.setText(sb);
 					text_scroll.fullScroll(ScrollView.FOCUS_DOWN);
-					sb.append("\n\n");
-					text_content.setText(sb);
-					text_scroll.fullScroll(ScrollView.FOCUS_DOWN);
-					break;
-				case ENABLE_BUTTON_CONNECT:
-					btn_connect.setEnabled(true);
-					username.setEnabled(true);
-					text_host.setEnabled(true);
-					text_port.setEnabled(true);
-					edit_send.setEnabled(false);
-					btn_send.setEnabled(false);
-					break;
-				case DISABLE_BUTTON_CONNECT:
-					btn_connect.setEnabled(false);
-					username.setEnabled(false);
-					text_host.setEnabled(false);
-					text_port.setEnabled(false);
-					edit_send.setEnabled(true);
-					btn_send.setEnabled(true);
-					edit_send.requestFocus();
-					break;
-				case ENABLE_BUTTON_DISCONNECT:
-					btn_disconnect.setEnabled(true);
-					break;
-				case DISABLE_BUTTON_DISCONNECT:
-					btn_disconnect.setEnabled(false);
 					break;
 				case CLEAR_EDIT_SEND:
 					edit_send.setText("");
@@ -122,18 +68,32 @@ public class MainActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_main);
 
 		text_content = findViewById(R.id.text_content);
-		text_host = findViewById(R.id.host);
-		text_port = findViewById(R.id.port);
-		username = findViewById(R.id.username);
 		edit_send = findViewById(R.id.edit_send);
 		btn_send = findViewById(R.id.btn_send);
-		btn_connect = findViewById(R.id.btn_connect);
-		btn_disconnect = findViewById(R.id.btn_disconnect);
 		text_scroll = findViewById(R.id.text_scroll);
 
-		sb = new StringBuilder();
-		username.setText(android.os.Build.MODEL);
-		username.requestFocus();
+		mainActivityAliveFlag = true;
+
+		refreshMsgListThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (mainActivityAliveFlag) {
+					try {
+						newServerMsg = myMsgList.get(0);
+						sendMsgToHandler(UPDATE_TEXT_FROM_SERVER);
+						Thread.sleep(50);
+						myMsgList.remove(0);
+//						System.out.println("显示内容" + newServerMsg + "删除myMsgList第一项");
+					} catch (Exception e) {
+//						System.out.println("不能删除myMsgList第一项");
+					}
+				}
+//				System.out.println("结束线程结束线程结束线程结束线程结束线程结束线程");
+			}
+		});
+//		System.out.println("运行线程运行线程运行线程运行线程运行线程运行线程");
+		refreshMsgListThread.start();
+
 
 		// 发送按钮点击事件
 		btn_send.setOnClickListener(new View.OnClickListener() {
@@ -147,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 							public void run() {
 								try {
 									newClientMsg = edit_send.getText().toString();
-									sendMsg(newClientMsg);
+									sendMsg(SocketService.setJSONContent(newClientMsg));
 									sendMsgToHandler(CLEAR_EDIT_SEND);
 								} catch (Exception e) {
 									e.printStackTrace();
@@ -156,73 +116,6 @@ public class MainActivity extends AppCompatActivity {
 						});
 						subThread_sendMsg.start();
 					}
-				}
-			}
-		});
-
-		// 连接按钮点击事件
-		btn_connect.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				subThread = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						host = text_host.getText().toString();
-						port = Integer.parseInt(text_port.getText().toString());
-						try {
-							newSystemMsg = getCurrentDate() + "本机：正在连接服务器" + host + ":" + port;
-							sendMsgToHandler(UPDATE_TEXT_FROM_SYSTEM);
-
-							socket = new Socket(host, port);
-
-							newSystemMsg = getCurrentDate() + "本机：连接成功";
-							sendMsgToHandler(UPDATE_TEXT_FROM_SYSTEM);
-							sendMsgToHandler(DISABLE_BUTTON_CONNECT);
-							sendMsgToHandler(ENABLE_BUTTON_DISCONNECT);
-							connectionAliveFlag = true;
-							newClientMsg = username.getText().toString();
-							sendMsg(newClientMsg);
-							while (connectionAliveFlag) {
-								if ((newServerMsg = recvMsg()) != null) {
-									sendMsgToHandler(UPDATE_TEXT_FROM_SERVER);
-								}
-							}
-						} catch (IOException e) {
-							connectionAliveFlag = false;
-							newSystemMsg = getCurrentDate() + "本机：连接失败，服务器未响应";
-							sendMsgToHandler(UPDATE_TEXT_FROM_SYSTEM);
-							socket = null;
-							subThread = null;
-						}
-					}
-				});
-				subThread.start();
-			}
-		});
-
-		// 断开按钮点击事件
-		btn_disconnect.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				try {
-					out.close();
-					in.close();
-					socket.close();
-					connectionAliveFlag = false;
-					subThread = null;
-					subThread_sendMsg = null;
-
-					newSystemMsg = getCurrentDate() + "本机：断开连接";
-//                    sendMsgToHandler(UPDATE_TEXT_FROM_SYSTEM);
-					sendMsgToHandler(ENABLE_BUTTON_CONNECT);
-					sendMsgToHandler(DISABLE_BUTTON_DISCONNECT);
-				} catch (Exception e) {
-					connectionAliveFlag = false;
-					newSystemMsg = "本机：断开连接时发生错误";
-					sendMsgToHandler(ENABLE_BUTTON_CONNECT);
-					sendMsgToHandler(DISABLE_BUTTON_DISCONNECT);
-					sendMsgToHandler(UPDATE_TEXT_FROM_SYSTEM);
 				}
 			}
 		});
@@ -245,20 +138,34 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	public String recvMsg() {
-		String msgReadyToRecv;
-		try {
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
-			msgReadyToRecv = in.readLine();
-			return msgReadyToRecv;
-		} catch (IOException e) {
-			connectionAliveFlag = false;
-//            newSystemMsg = getCurrentDate() + "本机：与服务器断开连接，消息接收失败\n";
-			sendMsgToHandler(ENABLE_BUTTON_CONNECT);
-			sendMsgToHandler(DISABLE_BUTTON_DISCONNECT);
-			sendMsgToHandler(UPDATE_TEXT_FROM_SYSTEM);
-			return null;
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.menu_main_titlebar, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		Intent serviceIntent = new Intent(MainActivity.this, SocketService.class);
+		Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+		switch (id) {
+			case R.id.menu_logout:
+				closeConnection();
+				stopService(serviceIntent);//退出聊天界面，返回登录页面
+				mainActivityAliveFlag = false;
+				loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(loginIntent);
+				return true;
+			case R.id.menu_about:
+				Toast.makeText(MainActivity.this, "Designed by QuainK.", Toast.LENGTH_SHORT).show();
+				return true;
 		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	public void sendMsgToHandler(int MsgType) {
@@ -267,8 +174,30 @@ public class MainActivity extends AppCompatActivity {
 		handler.sendMessage(msg);
 	}
 
-	public String getCurrentDate() {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		return "---" + sdf.format(new Date()) + "--- ";
+	@Override
+	public void onBackPressed() {
+		mainActivityAliveFlag = false;
+		finish();
+	}
+
+	public void closeConnection() {
+		new Thread(new Runnable() {// 创建新线程
+			@Override
+			public void run() {
+				try {
+					JSONObject root = new JSONObject();
+					root.put("userConnectionState", false);
+					sendMsg(root.toString());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				socketAliveFlag = false;
+				try {
+					socket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
 	}
 }
