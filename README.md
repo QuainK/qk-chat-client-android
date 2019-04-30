@@ -1,14 +1,11 @@
 # QKGroupChat_Client_Android
 **v0.1.0-beta**
-
-**适配服务器**
-QKGroupChat_Server_GUI
-QKGroupChat_Server_Console v0.1.0-beta
-
 ###### 最后一次修改 2019.04.21
 ###### 最后一次编译 2019.05.01
 
-客户端：实现群聊基本功能，使用基于TCP的Socket通信，提供GUI交互
+**适配服务器**<br>
+QKGroupChat_Server_GUI<br>
+QKGroupChat_Server_Console v0.1.0-beta
 
 **更新日志**<br>
 1. 优化UI：<br>
