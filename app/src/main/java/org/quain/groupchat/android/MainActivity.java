@@ -5,19 +5,20 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -38,21 +39,17 @@ public class MainActivity extends AppCompatActivity {
 	Button btn_send;
 	Button btn_connect;
 	Button btn_disconnect;
-
-	Thread subThread;
-	Thread subThread_sendMsg;
+	ScrollView text_scroll;
 
 	String host;
 	int port;
 	Socket socket;
 
-	OutputStream os;// 输出流
-	OutputStreamWriter osr;
-	BufferedWriter bw;
-	PrintWriter out;// 打印流
-	InputStream is;// 输入流，字节流
-	InputStreamReader isr;// 字符流
-	BufferedReader in;// 缓冲流
+	PrintWriter out;// 字符输出流
+	BufferedReader in;// 字符输入流
+
+	Thread subThread;//连接服务器、接收消息线程
+	Thread subThread_sendMsg;//发送消息线程
 
 	StringBuilder sb;
 	String newServerMsg;
@@ -67,20 +64,41 @@ public class MainActivity extends AppCompatActivity {
 		public boolean handleMessage(Message msg) {
 			switch (msg.what) {
 				case UPDATE_TEXT_FROM_SYSTEM:
-					sb.append(newSystemMsg);
+					sb.append(newSystemMsg.substring(0, newSystemMsg.indexOf("：")));
 					sb.append("\n");
+					sb.append(newSystemMsg.substring(newSystemMsg.indexOf("：") + 1));
 					text_content.setText(sb);
+					text_scroll.fullScroll(ScrollView.FOCUS_DOWN);
+					sb.append("\n\n");
+					text_content.setText(sb);
+					text_scroll.fullScroll(ScrollView.FOCUS_DOWN);
 					break;
 				case UPDATE_TEXT_FROM_SERVER:
-					sb.append(newServerMsg);
+					sb.append(newServerMsg.substring(0, newServerMsg.indexOf("：")));
 					sb.append("\n");
+					sb.append(newServerMsg.substring(newServerMsg.indexOf("：") + 1));
 					text_content.setText(sb);
+					text_scroll.fullScroll(ScrollView.FOCUS_DOWN);
+					sb.append("\n\n");
+					text_content.setText(sb);
+					text_scroll.fullScroll(ScrollView.FOCUS_DOWN);
 					break;
 				case ENABLE_BUTTON_CONNECT:
 					btn_connect.setEnabled(true);
+					username.setEnabled(true);
+					text_host.setEnabled(true);
+					text_port.setEnabled(true);
+					edit_send.setEnabled(false);
+					btn_send.setEnabled(false);
 					break;
 				case DISABLE_BUTTON_CONNECT:
 					btn_connect.setEnabled(false);
+					username.setEnabled(false);
+					text_host.setEnabled(false);
+					text_port.setEnabled(false);
+					edit_send.setEnabled(true);
+					btn_send.setEnabled(true);
+					edit_send.requestFocus();
 					break;
 				case ENABLE_BUTTON_DISCONNECT:
 					btn_disconnect.setEnabled(true);
@@ -90,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
 					break;
 				case CLEAR_EDIT_SEND:
 					edit_send.setText("");
+					edit_send.requestFocus();
 					break;
 				default:
 					break;
@@ -104,16 +123,18 @@ public class MainActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_main);
 
 		text_content = findViewById(R.id.text_content);
-		text_host = findViewById(R.id.txt_host);
-		text_port = findViewById(R.id.txt_port);
+		text_host = findViewById(R.id.host);
+		text_port = findViewById(R.id.port);
 		username = findViewById(R.id.username);
 		edit_send = findViewById(R.id.edit_send);
 		btn_send = findViewById(R.id.btn_send);
 		btn_connect = findViewById(R.id.btn_connect);
 		btn_disconnect = findViewById(R.id.btn_disconnect);
+		text_scroll = findViewById(R.id.text_scroll);
 
 		sb = new StringBuilder();
 		username.setText(android.os.Build.MODEL);
+		username.requestFocus();
 
 		// 发送按钮点击事件
 		btn_send.setOnClickListener(new View.OnClickListener() {
@@ -151,12 +172,12 @@ public class MainActivity extends AppCompatActivity {
 						host = text_host.getText().toString();
 						port = Integer.parseInt(text_port.getText().toString());
 						try {
-							newSystemMsg = getCurrentDate() + "本机：正在连接服务器" + host + ":" + port + "\n";
+							newSystemMsg = getCurrentDate() + "本机：正在连接服务器" + host + ":" + port;
 							sendMsgToHandler(UPDATE_TEXT_FROM_SYSTEM);
 
 							socket = new Socket(host, port);
 
-							newSystemMsg = getCurrentDate() + "本机：连接成功\n";
+							newSystemMsg = getCurrentDate() + "本机：连接成功";
 							sendMsgToHandler(UPDATE_TEXT_FROM_SYSTEM);
 							sendMsgToHandler(DISABLE_BUTTON_CONNECT);
 							sendMsgToHandler(ENABLE_BUTTON_DISCONNECT);
@@ -170,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
 							}
 						} catch (IOException e) {
 							connectionAliveFlag = false;
-							newSystemMsg = getCurrentDate() + "本机：连接失败，服务器未响应\n";
+							newSystemMsg = getCurrentDate() + "本机：连接失败，服务器未响应";
 							sendMsgToHandler(UPDATE_TEXT_FROM_SYSTEM);
 							socket = null;
 							subThread = null;
@@ -193,27 +214,31 @@ public class MainActivity extends AppCompatActivity {
 					subThread = null;
 					subThread_sendMsg = null;
 
-					newSystemMsg = getCurrentDate() + "本机：断开连接\n";
-					sendMsgToHandler(UPDATE_TEXT_FROM_SYSTEM);
+					newSystemMsg = getCurrentDate() + "本机：断开连接";
+//                    sendMsgToHandler(UPDATE_TEXT_FROM_SYSTEM);
 					sendMsgToHandler(ENABLE_BUTTON_CONNECT);
 					sendMsgToHandler(DISABLE_BUTTON_DISCONNECT);
 				} catch (Exception e) {
 					connectionAliveFlag = false;
-					newSystemMsg = "本机：断开连接时发生错误\n";
+					newSystemMsg = "本机：断开连接时发生错误";
 					sendMsgToHandler(ENABLE_BUTTON_CONNECT);
 					sendMsgToHandler(DISABLE_BUTTON_DISCONNECT);
 					sendMsgToHandler(UPDATE_TEXT_FROM_SYSTEM);
 				}
 			}
 		});
+
+		text_scroll.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				text_scroll.fullScroll(ScrollView.FOCUS_DOWN);
+			}
+		});
 	}
 
 	public void sendMsg(String msgReadyToSend) {
 		try {
-			os = socket.getOutputStream();
-			osr = new OutputStreamWriter(os);
-			bw = new BufferedWriter(osr);
-			out = new PrintWriter(bw, true);
+			out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 			out.println(msgReadyToSend);
 			out.flush();
 		} catch (IOException e) {
@@ -224,14 +249,12 @@ public class MainActivity extends AppCompatActivity {
 	public String recvMsg() {
 		String msgReadyToRecv;
 		try {
-			is = socket.getInputStream();
-			isr = new InputStreamReader(is, "UTF-8");
-			in = new BufferedReader(isr);
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
 			msgReadyToRecv = in.readLine();
 			return msgReadyToRecv;
 		} catch (IOException e) {
 			connectionAliveFlag = false;
-			newSystemMsg = getCurrentDate() + "本机：与服务器断开连接，消息接收失败\n";
+//            newSystemMsg = getCurrentDate() + "本机：与服务器断开连接，消息接收失败\n";
 			sendMsgToHandler(ENABLE_BUTTON_CONNECT);
 			sendMsgToHandler(DISABLE_BUTTON_DISCONNECT);
 			sendMsgToHandler(UPDATE_TEXT_FROM_SYSTEM);
@@ -247,6 +270,6 @@ public class MainActivity extends AppCompatActivity {
 
 	public String getCurrentDate() {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		return "***" + sdf.format(new Date());
+		return "---" + sdf.format(new Date()) + "--- ";
 	}
 }
