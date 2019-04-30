@@ -1,0 +1,13 @@
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ExtraTranslation">
+    <string name="app_name">QKGroupChat</string>
+    <string name="host">服务器地址</string>
+    <string name="value_host">47.102.218.50</string>
+    <string name="port">端口</string>
+    <string name="value_port">2333</string>
+    <string name="username">用户名</string>
+    <string name="btn_connect">连接</string>
+    <string name="btn_disconnect">断开</string>
+    <string name="edit_send">消息</string>
+    <string name="btn_send">发送</string>
+    <string name="text_content">\n</string>
+</resources>
