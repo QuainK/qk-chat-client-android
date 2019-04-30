@@ -18,7 +18,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -249,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
 	public String recvMsg() {
 		String msgReadyToRecv;
 		try {
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
 			msgReadyToRecv = in.readLine();
 			return msgReadyToRecv;
 		} catch (IOException e) {
