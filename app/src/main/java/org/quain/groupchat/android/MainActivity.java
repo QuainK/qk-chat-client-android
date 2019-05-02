@@ -1,14 +1,26 @@
 package org.quain.groupchat.android;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.os.*;
-import android.view.*;
-import android.content.*;
-import android.widget.*;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 import static org.quain.groupchat.android.SocketService.myMsgList;
 import static org.quain.groupchat.android.SocketService.socket;
@@ -18,20 +30,18 @@ public class MainActivity extends AppCompatActivity {
 	public static final int UPDATE_TEXT_FROM_SYSTEM = 0;
 	public static final int UPDATE_TEXT_FROM_SERVER = 1;
 	public static final int CLEAR_EDIT_SEND = 2;
-
-	TextView text_content;
-	EditText edit_send;
-	Button btn_send;
-	ScrollView text_scroll;
-
-	PrintWriter out;// 字符输出流
-	Thread subThread_sendMsg;//发送消息线程
+	public static boolean mainActivityAliveFlag = false;
+	public static Thread refreshMsgListThread;
 	static StringBuilder sb = new StringBuilder();
 	static String newServerMsg;
 	static String newClientMsg;
 	static String newSystemMsg;
-	public static boolean mainActivityAliveFlag = false;
-	public static Thread refreshMsgListThread;
+	TextView text_content;
+	EditText edit_send;
+	Button btn_send;
+	ScrollView text_scroll;
+	PrintWriter out;// 字符输出流
+	Thread subThread_sendMsg;//发送消息线程
 	//定义一个handler对象，用来刷新界面
 	Handler handler = new Handler(new Handler.Callback() {
 		@Override
