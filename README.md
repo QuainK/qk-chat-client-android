@@ -5,7 +5,6 @@
 ###### 最后一次编译 2019.05.01
 
 **适配服务器**<br>
-QKGroupChat_Server_GUI<br>
 QKGroupChat_Server_Console v0.2.0-beta<br>
 
 **更新日志**<br>
