@@ -1,5 +1,5 @@
 # QKGroupChat_Client_Android
-**v0.2.0-beta-pu**
+**v0.2.0-beta-pu**<br>
 **与 v0.2.0-beta 版本等级相同，此版本是个性化版本**
 
 ###### 最后一次修改 2019.04.27
