@@ -1,13 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ExtraTranslation">
-    <string name="app_name">QKGroupChat</string>
-    <string name="host">服务器地址</string>
-    <string name="value_host">47.102.218.50</string>
+    <string name="app_name">PuGroupChat</string>
+    <string name="host">服务器 IPv4 地址</string>
+    <string name="value_host">192.168.42.1</string>
     <string name="port">端口</string>
     <string name="value_port">2333</string>
     <string name="username">用户名</string>
     <string name="btn_login">登录</string>
 
-    <string name="text_content">(群聊内容)</string>
+    <string name="text_content">（请发送一条消息以刷新内容显示）</string>
 
     <string name="edit_send">消息</string>
     <string name="btn_send">发送</string>
@@ -15,6 +15,5 @@
     <string name="menu_logout">退出登录</string>
     <string name="menu_about">关于应用</string>
 
-    <string name="btn_connect">连接</string>
-    <string name="btn_disconnect">断开</string>
+    <string name="copyright_info">© 2019 Pu Yiquan</string>
 </resources>
