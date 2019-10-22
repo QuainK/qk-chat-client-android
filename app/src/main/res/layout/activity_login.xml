@@ -1,100 +1,131 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-	<ScrollView
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffffff" />
 
-	<LinearLayout
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_centerHorizontal="true"
-		android:layout_centerVertical="true"
-		android:layout_gravity="center_vertical"
-		android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:orientation="vertical">
 
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center_horizontal"
-			android:singleLine="true"
-			android:text="@string/app_name"
-			android:textSize="24.0sp" />
+        <!--        <TextView-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_gravity="center_horizontal"-->
+        <!--            android:paddingBottom="30dp"-->
+        <!--            android:singleLine="true"-->
+        <!--            android:text="@string/app_name"-->
+        <!--            android:textSize="24sp"-->
+        <!--            android:textColor="#000000"/>-->
 
-		<LinearLayout
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal">
 
-			<TextView
-				android:layout_width="0.0dip"
-				android:layout_height="wrap_content"
-				android:layout_weight="3.0"
-				android:singleLine="true"
-				android:text="@string/host"
-				android:textSize="16.0sp" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_weight="3"
+                android:singleLine="true"
+                android:text="@string/host"
+                android:textSize="16sp" />
 
-			<TextView
-				android:layout_width="0.0dip"
-				android:layout_height="wrap_content"
-				android:layout_weight="1.0"
-				android:singleLine="true"
-				android:text="@string/port"
-				android:textSize="16.0sp" />
-		</LinearLayout>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:singleLine="true"
+                android:text="@string/port"
+                android:textSize="16sp" />
+        </LinearLayout>
 
-		<LinearLayout
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="20dp">
 
-			<EditText
-				android:id="@+id/host"
-				android:layout_width="0.0dip"
-				android:layout_height="wrap_content"
-				android:layout_weight="3.0"
-				android:hint="@string/value_host"
-				android:inputType="text"
-				android:singleLine="true"
-				android:text="@string/value_host"
-				android:textSize="18.0sp" />
+            <EditText
 
-			<EditText
-				android:id="@+id/port"
-				android:layout_width="0.0dip"
-				android:layout_height="wrap_content"
-				android:layout_weight="1.0"
-				android:hint="@string/value_port"
-				android:inputType="numberDecimal"
-				android:singleLine="true"
-				android:text="@string/value_port"
-				android:textSize="18.0sp" />
-		</LinearLayout>
+                android:id="@+id/host"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="3"
+                android:background="@drawable/edit_text"
+                android:hint="@string/value_host"
+                android:inputType="text"
+                android:singleLine="true"
+                android:text="@string/value_host"
+                android:textColor="#000000"
+                android:textSize="18sp" />
 
-		<TextView
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:singleLine="true"
-			android:text="@string/username"
-			android:textSize="16.0sp" />
+            <EditText
+                android:id="@+id/port"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/edit_text"
+                android:hint="@string/value_port"
+                android:inputType="numberDecimal"
+                android:singleLine="true"
+                android:text="@string/value_port"
+                android:textColor="#000000"
+                android:textSize="18sp" />
+        </LinearLayout>
 
-		<EditText
-			android:id="@+id/username"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:hint="@string/username"
-			android:inputType="text"
-			android:singleLine="true"
-			android:textSize="18.0sp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:singleLine="true"
+            android:text="@string/username"
+            android:textSize="16sp" />
 
-		<Button
-			android:id="@+id/btn_login"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center_horizontal"
-			android:text="@string/btn_login"
-			android:textSize="20.0sp" />
-	</LinearLayout>
+        <EditText
+            android:id="@+id/username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_text"
+            android:hint="@string/username"
+            android:inputType="text"
+            android:singleLine="true"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/login_button"
+            android:text="@string/btn_login"
+            android:textColor="#ffffff"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:gravity="center_horizontal"
+            android:text="@string/copyright_info"
+            android:textSize="14sp" />
+    </LinearLayout>
 </RelativeLayout>

@@ -14,17 +14,17 @@
 		<service
 			android:name=".SocketService"
 			android:enabled="true"
-			android:exported="true">
+			android:exported="false">
 
 		</service>
 
 		<activity android:name=".LoginActivity">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<action android:name="android.intent.action.VIEW" />
+<!--			<intent-filter>-->
+<!--				<action android:name="android.intent.action.MAIN" />-->
+<!--				<action android:name="android.intent.action.VIEW" />-->
 
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
+<!--				<category android:name="android.intent.category.LAUNCHER" />-->
+<!--			</intent-filter>-->
 		</activity>
 		<activity
 			android:name=".MainActivity"
@@ -32,6 +32,8 @@
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.LAUNCHER" />
+
 			</intent-filter>
 		</activity>
 	</application>
