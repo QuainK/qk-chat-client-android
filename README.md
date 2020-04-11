@@ -14,7 +14,7 @@
 
 Java SE 8 及以上
 
-Android API 15 及以上
+Android API 23 及以上
 
 ### 字符集与编码方案
 
