@@ -15,6 +15,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class SocketService extends Service {
                     mainIntent.setFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
                     startActivity(mainIntent);
                     while (SocketService.socketAliveFlag) {
-                        SocketService.newServerMsg = SocketService.this.recvMsg();
+                        SocketService.newServerMsg = SocketService.this.receiveMsg();
                         if (SocketService.newServerMsg == null) {
                             break;
                         }
@@ -124,9 +125,9 @@ public class SocketService extends Service {
         }
     }
 
-    public String recvMsg() {
+    public String receiveMsg() {
         try {
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
             return in.readLine();
         } catch (IOException e) {
             e.printStackTrace();

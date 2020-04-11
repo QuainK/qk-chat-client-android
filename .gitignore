@@ -48,7 +48,7 @@ google-services.json
 .gradle/
 build/
 gradle/
-gradle.properties
+#gradle.properties
 gradlew
 gradlew.bat
 

@@ -1,13 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ExtraTranslation">
-    <string name="app_name">PuGroupChat</string>
+    <string name="app_name">QKGroupChat</string>
     <string name="host">服务器 IPv4 地址</string>
-    <string name="value_host">192.168.42.1</string>
+    <string name="value_host">192.168.43.223</string>
     <string name="port">端口</string>
     <string name="value_port">2333</string>
     <string name="username">用户名</string>
     <string name="btn_login">登录</string>
 
-    <string name="text_content">（请发送一条消息以刷新内容显示）</string>
+    <string name="text_content">非常抱歉，这是一个尚未修复的问题。请发送一条消息或等待收到新消息以正常显示文本内容）</string>
 
     <string name="edit_send">消息</string>
     <string name="btn_send">发送</string>
@@ -15,5 +15,5 @@
     <string name="menu_logout">退出登录</string>
     <string name="menu_about">关于应用</string>
 
-    <string name="copyright_info">© 2019 Pu Yiquan</string>
+    <string name="copyright_info">© 2019–2020 QuainK</string>
 </resources>

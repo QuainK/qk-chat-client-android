@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(loginIntent);
                 return true;
             case R.id.menu_about:
-                Toast.makeText(MainActivity.this, "PuGroupChat v0.2.0-beta-pu\nDesigned by Pu Yiquan.", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "QKGroupChat v0.3.0-beta\nDesigned by QuainK", Toast.LENGTH_LONG).show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
