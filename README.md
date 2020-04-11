@@ -24,7 +24,7 @@ Android API 23 及以上
 
 ### 适配的服务器端
 
-QKGroupChat_Server_Console **v0.2.0-beta**
+QKGroupChat_Server_Console **v0.2.1-beta** **v0.2.0-beta**
 
 ---
 
